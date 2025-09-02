@@ -5,7 +5,7 @@ def test_real_university_search():
     # Test with a well-known university
     test_universities = [
         "Indian Institute of Technology Delhi",
-        "Delhi University",
+        "Delhi University,Delhi",
         "Jawaharlal Nehru University"
     ]
     
