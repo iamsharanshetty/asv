@@ -3,6 +3,7 @@ import tempfile
 import json
 import time
 import re
+from typing import List, Dict 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -1092,33 +1093,360 @@ def calculate_pattern_based_trust_score(claim, evidence_sources):
         print(f"⚠️ Error calculating pattern-based trust score: {e}")
         return 50  # Default moderate score
 
-@app.get("/")
-def root():
-    return {
-        "message": "Robust Professional Document Audit API", 
-        "version": "4.0.0",
-        "pdf_processing": PDF_AVAILABLE,
-        "full_pipeline": FULL_PIPELINE_AVAILABLE,
-        "features": [
-            "Real PDF text extraction with cleaning",
-            "Full LLM pipeline with evidence retrieval" if FULL_PIPELINE_AVAILABLE else "Enhanced pattern matching",
-            "Comprehensive claim analysis",
-            "Professional verdict assessment",
-            "Multi-category classification",
-            "Evidence-based reasoning"
-        ]
-    }
+# Add this import after your existing imports in robust_professional_main.py
+try:
+    from university_reviews import university_analyzer
+    UNIVERSITY_REVIEWS_AVAILABLE = True
+    print("✅ University review analysis loaded successfully")
+except ImportError as e:
+    UNIVERSITY_REVIEWS_AVAILABLE = False
+    print(f"⚠️ University review analysis not available: {e}")
 
+# Add this Pydantic model after your existing FileAnalysisRequest class
+class UniversitySearchRequest(BaseModel):
+    university_name: str
+
+# Add this new endpoint before your existing @app.get("/") route
+# @app.post("/api/university-reviews")
+# async def search_university_reviews(request: UniversitySearchRequest):
+#     """
+#     Search for university negative reviews and feedback
+#     """
+#     try:
+#         if not UNIVERSITY_REVIEWS_AVAILABLE:
+#             raise HTTPException(
+#                 status_code=503, 
+#                 detail="University review analysis service not available"
+#             )
+        
+#         university_name = request.university_name.strip()
+        
+#         if not university_name:
+#             raise HTTPException(
+#                 status_code=400, 
+#                 detail="University name is required"
+#             )
+        
+#         if len(university_name) < 3:
+#             raise HTTPException(
+#                 status_code=400, 
+#                 detail="University name must be at least 3 characters long"
+#             )
+        
+#         print(f"🏫 Starting university review search for: {university_name}")
+        
+#         # Perform the search
+#         results = university_analyzer.search_university_reviews(university_name)
+        
+#         if results.get('search_status') == 'error':
+#             raise HTTPException(
+#                 status_code=500, 
+#                 detail=f"Search failed: {results.get('error', 'Unknown error')}"
+#             )
+        
+#         # Add metadata
+#         results['api_version'] = '1.0'
+#         results['search_method'] = 'web_scraping_analysis'
+        
+#         print(f"✅ University search completed: {len(results.get('negative_reviews', []))} reviews found")
+        
+#         return JSONResponse(content=results, status_code=200)
+        
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         print(f"🚨 University search error: {str(e)}")
+#         raise HTTPException(
+#             status_code=500, 
+#             detail=f"University search failed: {str(e)}"
+#         )
+
+# # Update your existing @app.get("/") route to include the new feature
+# # Replace the existing root function with this updated version:
+# @app.get("/")
+# def root():
+#     return {
+#         "message": "Robust Professional Document Audit API", 
+#         "version": "4.0.0",
+#         "pdf_processing": PDF_AVAILABLE,
+#         "full_pipeline": FULL_PIPELINE_AVAILABLE,
+#         "university_reviews": UNIVERSITY_REVIEWS_AVAILABLE,
+#         "features": [
+#             "Real PDF text extraction with cleaning",
+#             "Full LLM pipeline with evidence retrieval" if FULL_PIPELINE_AVAILABLE else "Enhanced pattern matching",
+#             "Comprehensive claim analysis",
+#             "Professional verdict assessment",
+#             "Multi-category classification",
+#             "Evidence-based reasoning",
+#             "University review analysis" if UNIVERSITY_REVIEWS_AVAILABLE else "University review analysis (unavailable)"
+#         ]
+#     }
+
+# # Update your existing @app.get("/status") route to include university reviews status
+# # Replace the existing status function with this updated version:
+# @app.get("/status")
+# def status():
+#     return {
+#         "status": "ok", 
+#         "message": "Robust professional server running",
+#         "pdf_processing": PDF_AVAILABLE,
+#         "full_pipeline": FULL_PIPELINE_AVAILABLE,
+#         "web_scraping": WEB_SCRAPING_AVAILABLE,
+#         "university_reviews": UNIVERSITY_REVIEWS_AVAILABLE,
+#         "analysis_mode": "full_llm_pipeline" if FULL_PIPELINE_AVAILABLE else "enhanced_pattern_matching"
+#     }
+
+# Add these fixes to your robust_professional_main.py file
+
+# 1. UPDATED IMPORT SECTION - Replace your existing university reviews import
+try:
+    from university_reviews import university_analyzer
+    UNIVERSITY_REVIEWS_AVAILABLE = True
+    print("✅ University review analysis loaded successfully")
+    
+    # Test the analyzer initialization
+    test_analyzer = university_analyzer
+    print("✅ University analyzer initialized and ready")
+    
+except ImportError as e:
+    UNIVERSITY_REVIEWS_AVAILABLE = False
+    print(f"⚠️ University review analysis not available: {e}")
+except Exception as e:
+    UNIVERSITY_REVIEWS_AVAILABLE = False
+    print(f"⚠️ University analyzer initialization failed: {e}")
+
+# 2. ENHANCED UNIVERSITY SEARCH REQUEST MODEL
+class UniversitySearchRequest(BaseModel):
+    university_name: str
+    include_debug: bool = False  # Optional debug information
+
+# 3. UPDATED UNIVERSITY REVIEWS ENDPOINT - Replace your existing endpoint
+@app.post("/api/university-reviews")
+async def search_university_reviews(request: UniversitySearchRequest):
+    """
+    FIXED: Search for university negative reviews and feedback with enhanced error handling
+    """
+    try:
+        if not UNIVERSITY_REVIEWS_AVAILABLE:
+            # Return detailed error information
+            return JSONResponse(
+                content={
+                    "error": "University review analysis service not available",
+                    "details": "Required dependencies (duckduckgo-search, beautifulsoup4) may not be installed",
+                    "university_name": request.university_name,
+                    "search_status": "service_unavailable"
+                },
+                status_code=503
+            )
+        
+        university_name = request.university_name.strip()
+        
+        # Enhanced validation
+        if not university_name:
+            raise HTTPException(
+                status_code=400, 
+                detail="University name is required and cannot be empty"
+            )
+        
+        if len(university_name) < 3:
+            raise HTTPException(
+                status_code=400, 
+                detail="University name must be at least 3 characters long"
+            )
+        
+        # Log the search attempt
+        print(f"🎓 API: Starting university review search for: '{university_name}'")
+        
+        # Perform the search with enhanced error handling
+        try:
+            results = university_analyzer.search_university_reviews(university_name)
+            
+            # Add API metadata
+            results['api_version'] = '2.0'
+            results['search_method'] = 'enhanced_web_scraping'
+            results['service_status'] = 'operational'
+            
+            # Include debug info if requested
+            if request.include_debug:
+                results['debug_info']['search_available'] = WEB_SEARCH_AVAILABLE
+                results['debug_info']['total_sources'] = len(results.get('sources', []))
+            
+            # Validate results structure
+            if 'search_status' in results and results['search_status'] == 'error':
+                # Handle search-level errors
+                error_detail = results.get('error', 'Unknown search error')
+                print(f"🚨 Search failed: {error_detail}")
+                
+                # Still return partial results with error info
+                return JSONResponse(
+                    content={
+                        **results,
+                        "api_error": "Search completed with errors",
+                        "fallback_data": True
+                    },
+                    status_code=200  # Return 200 with error info instead of 500
+                )
+            
+            # Log success
+            review_count = len(results.get('negative_reviews', []))
+            source_count = len(results.get('sources', []))
+            ranking = results.get('nirf_ranking', {}).get('ranking', 'Not found')
+            
+            print(f"✅ University search completed successfully:")
+            print(f"   - Reviews found: {review_count}")
+            print(f"   - Sources found: {source_count}")
+            print(f"   - NIRF ranking: {ranking}")
+            
+            return JSONResponse(content=results, status_code=200)
+            
+        except Exception as search_error:
+            print(f"🚨 Real-time search failed: {search_error}")
+            
+            # Return HONEST error response - NO FAKE DATA
+            error_response = {
+                "university_name": university_name,
+                "nirf_ranking": None,
+                "negative_reviews": [],  # EMPTY - no fake data
+                "positive_reviews": [],  # EMPTY - no fake data  
+                "review_summary": {
+                    "total_negative_reviews": 0,
+                    "total_positive_reviews": 0,
+                    "average_rating": 0,
+                    "common_complaints": []
+                },
+                "sources": [],  # EMPTY - no fake sources
+                "analysis_timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "search_status": "search_failed",
+                "error": str(search_error),
+                "message": f"Unable to fetch real-time data for '{university_name}'. This could be due to network issues, university name spelling, or limited online presence.",
+                "suggestions": [
+                    "Verify the exact university name spelling",
+                    "Try the official university name", 
+                    "Check if the university has online reviews",
+                    "Ensure stable internet connection"
+                ],
+                "api_version": "3.0_realtime",
+                "search_method": "failed",
+                "processing_time": round(time.time() - start_time, 2)
+            }
+            
+            return JSONResponse(content=error_response, status_code=200)
+        
+    except HTTPException:
+        raise
+    except Exception as api_error:
+        print(f"🚨 API-level error: {api_error}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"University search API failed: {str(api_error)}"
+        )
+    
+def validate_university_search_results(results: Dict) -> Dict:
+    """Validate and clean university search results"""
+    
+    # Remove any sample/fake data markers
+    if results.get('negative_reviews'):
+        results['negative_reviews'] = [
+            review for review in results['negative_reviews']
+            if 'sample' not in review.get('content', '').lower() and
+               'this is sample data' not in review.get('content', '').lower()
+        ]
+    
+    if results.get('sources'):
+        results['sources'] = [
+            source for source in results['sources']
+            if 'sample' not in source.get('title', '').lower() and
+               source.get('url', '').startswith('http')
+        ]
+    
+    # Validate NIRF ranking
+    if results.get('nirf_ranking') and not results['nirf_ranking'].get('verified'):
+        if results['nirf_ranking'].get('ranking') and results['nirf_ranking']['ranking'] > 1000:
+            results['nirf_ranking']['ranking'] = None
+            results['nirf_ranking']['note'] = 'Ranking validation failed - may not be accurate'
+    
+    return results
+
+
+
+def validate_real_data(results: Dict) -> bool:
+    """Validate that we have real data, not fake data"""
+    # Check if we have actual sources
+    real_sources = [s for s in results.get('sources', []) if 'sample' not in s.get('title', '').lower()]
+    
+    # Check if reviews mention specific details
+    reviews = results.get('negative_reviews', []) + results.get('positive_reviews', [])
+    real_reviews = [r for r in reviews if 'sample' not in r.get('content', '').lower()]
+    
+    return len(real_sources) > 0 and len(real_reviews) > 0
+
+# 5. ENHANCED STATUS ENDPOINT - Replace your existing status endpoint
 @app.get("/status")
-def status():
+def enhanced_status():
+    """Enhanced status endpoint with university review testing"""
+    
+    # Test university analyzer if available
+    university_test_status = "not_available"
+    if UNIVERSITY_REVIEWS_AVAILABLE:
+        try:
+            # Quick test of the analyzer
+            test_result = university_analyzer.search_university_reviews("Test University")
+            if test_result and 'search_status' in test_result:
+                university_test_status = "operational"
+            else:
+                university_test_status = "error"
+        except Exception as e:
+            university_test_status = f"error: {str(e)}"
+    
     return {
         "status": "ok", 
-        "message": "Robust professional server running",
-        "pdf_processing": PDF_AVAILABLE,
-        "full_pipeline": FULL_PIPELINE_AVAILABLE,
-        "web_scraping": WEB_SCRAPING_AVAILABLE,
-        "analysis_mode": "full_llm_pipeline" if FULL_PIPELINE_AVAILABLE else "enhanced_pattern_matching"
+        "message": "Enhanced professional server running with university review analysis",
+        "services": {
+            "pdf_processing": PDF_AVAILABLE,
+            "full_pipeline": FULL_PIPELINE_AVAILABLE,
+            "web_scraping": WEB_SCRAPING_AVAILABLE,
+            "university_reviews": UNIVERSITY_REVIEWS_AVAILABLE,
+            "university_test_status": university_test_status
+        },
+        "analysis_mode": "full_llm_pipeline" if FULL_PIPELINE_AVAILABLE else "enhanced_pattern_matching",
+        "endpoints": [
+            "/analyze - Document claim analysis",
+            "/api/university-reviews - University review search",
+            "/status - Service status check"
+        ],
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
     }
+
+# 6. TEST ENDPOINT FOR DEBUGGING
+@app.get("/test/university/{university_name}")
+async def test_university_search(university_name: str):
+    """Test endpoint for debugging university search issues"""
+    
+    if not UNIVERSITY_REVIEWS_AVAILABLE:
+        return {
+            "error": "University review service not available",
+            "university_name": university_name,
+            "debug": "Check if duckduckgo-search and beautifulsoup4 are installed"
+        }
+    
+    try:
+        print(f"🧪 Testing university search for: {university_name}")
+        
+        # Direct test of the analyzer
+        result = university_analyzer.search_university_reviews(university_name)
+        
+        # Add test metadata
+        result['test_mode'] = True
+        result['endpoint'] = f"/test/university/{university_name}"
+        
+        return result
+        
+    except Exception as e:
+        return {
+            "error": f"Test failed: {str(e)}",
+            "university_name": university_name,
+            "debug": "Check server logs for detailed error information"
+        }
 
 @app.post("/analyze")
 async def analyze(request: FileAnalysisRequest):
