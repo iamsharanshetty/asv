@@ -1122,7 +1122,7 @@ class UniversityReviewAnalyzer:
         if total_ratings:
             results['review_summary']['average_rating'] = round(sum(total_ratings) / len(total_ratings), 2)
         
-        print(f"✅ Pattern analysis complete: {len(complaint_counts)} complaint types, {len(praise_counts)} praise types")
+        print(f"✅ Pattern analysis completed: {len(complaint_counts)} complaint types, {len(praise_counts)} praise types")
     
     def extract_numeric_rating(self, rating_str: Optional[str]) -> Optional[float]:
         """Extract numeric rating from rating string"""
