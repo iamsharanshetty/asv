@@ -75,7 +75,7 @@ class UniversityReviewAnalyzer:
         
         results = {
             'university_name': university_name,
-            'nirf_ranking': None,
+            # 'nirf_ranking': None,
             'negative_reviews': [],
             'positive_reviews': [],
             'review_summary': {
@@ -95,11 +95,13 @@ class UniversityReviewAnalyzer:
                 'scraped_platforms': []
             }
         }
+
+         
         
         try:
             # Step 1: Get REAL NIRF ranking
-            print("📊 Fetching real NIRF ranking...")
-            results['nirf_ranking'] = self.fetch_real_nirf_ranking(university_name)
+            # print("📊 Fetching real NIRF ranking...")
+            # results['nirf_ranking'] = self.fetch_real_nirf_ranking(university_name)
             
             # Step 2: Search multiple review platforms for REAL data
             print("🔍 Searching real review platforms...")
@@ -1154,7 +1156,7 @@ class UniversityReviewAnalyzer:
         """Return standardized error response"""
         return {
             'university_name': '',
-            'nirf_ranking': None,
+            # 'nirf_ranking': None,
             'negative_reviews': [],
             'positive_reviews': [],
             'review_summary': {

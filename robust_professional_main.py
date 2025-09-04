@@ -1163,24 +1163,24 @@ class UniversitySearchRequest(BaseModel):
 
 # # Update your existing @app.get("/") route to include the new feature
 # # Replace the existing root function with this updated version:
-# @app.get("/")
-# def root():
-#     return {
-#         "message": "Robust Professional Document Audit API", 
-#         "version": "4.0.0",
-#         "pdf_processing": PDF_AVAILABLE,
-#         "full_pipeline": FULL_PIPELINE_AVAILABLE,
-#         "university_reviews": UNIVERSITY_REVIEWS_AVAILABLE,
-#         "features": [
-#             "Real PDF text extraction with cleaning",
-#             "Full LLM pipeline with evidence retrieval" if FULL_PIPELINE_AVAILABLE else "Enhanced pattern matching",
-#             "Comprehensive claim analysis",
-#             "Professional verdict assessment",
-#             "Multi-category classification",
-#             "Evidence-based reasoning",
-#             "University review analysis" if UNIVERSITY_REVIEWS_AVAILABLE else "University review analysis (unavailable)"
-#         ]
-#     }
+@app.get("/")
+def root():
+    return {
+        "message": "Robust Professional Document Audit API", 
+        "version": "4.0.0",
+        "pdf_processing": PDF_AVAILABLE,
+        "full_pipeline": FULL_PIPELINE_AVAILABLE,
+        "university_reviews": UNIVERSITY_REVIEWS_AVAILABLE,
+        "features": [
+            "Real PDF text extraction with cleaning",
+            "Full LLM pipeline with evidence retrieval" if FULL_PIPELINE_AVAILABLE else "Enhanced pattern matching",
+            "Comprehensive claim analysis",
+            "Professional verdict assessment",
+            "Multi-category classification",
+            "Evidence-based reasoning",
+            "University review analysis" if UNIVERSITY_REVIEWS_AVAILABLE else "University review analysis (unavailable)"
+        ]
+    }
 
 # # Update your existing @app.get("/status") route to include university reviews status
 # # Replace the existing status function with this updated version:
@@ -1295,7 +1295,7 @@ async def search_university_reviews(request: UniversitySearchRequest):
             print(f"✅ University search completed successfully:")
             print(f"   - Reviews found: {review_count}")
             print(f"   - Sources found: {source_count}")
-            print(f"   - NIRF ranking: {ranking}")
+            # print(f"   - NIRF ranking: {ranking}")
             
             return JSONResponse(content=results, status_code=200)
             
@@ -1305,7 +1305,7 @@ async def search_university_reviews(request: UniversitySearchRequest):
             # Return HONEST error response - NO FAKE DATA
             error_response = {
                 "university_name": university_name,
-                "nirf_ranking": None,
+                # "nirf_ranking": None,
                 "negative_reviews": [],  # EMPTY - no fake data
                 "positive_reviews": [],  # EMPTY - no fake data  
                 "review_summary": {
