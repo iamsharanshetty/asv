@@ -1,18 +1,57 @@
+# fastapi>=0.104.1
+# uvicorn[standard]>=0.24.0
+# python-multipart>=0.0.6
+# python-dotenv>=1.0.1
+# langchain>=0.1.0
+# langchain-community>=0.0.200
+# langchain-openai>=0.0.200
+# langchain-core>=0.1.0
+# openai>=1.9.0
+# pypdf>=3.15.0
+# PyPDF2>=3.0.1
+# requests>=2.31.0
+# duckduckgo-search>=4.0.0
+# tqdm>=4.66.1
+# beautifulsoup4>=4.12.2
+# selenium>=4.15.0
+# lxml>=4.9.0
+# fake-useragent>=1.4.0
+# reportlab>=4.0.0
+
+# Updated requirements.txt for university review analysis
+
+# Core FastAPI dependencies
 fastapi>=0.104.1
 uvicorn[standard]>=0.24.0
 python-multipart>=0.0.6
 python-dotenv>=1.0.1
+
+# LLM and Language Processing
 langchain>=0.1.0
 langchain-community>=0.0.200
 langchain-openai>=0.0.200
 langchain-core>=0.1.0
 openai>=1.9.0
+
+# PDF Processing
 pypdf>=3.15.0
 PyPDF2>=3.0.1
-requests>=2.31.0
-duckduckgo-search>=4.0.0
-tqdm>=4.66.1
+
+# Web Scraping and Search - FIXED VERSIONS
+duckduckgo-search>=4.1.0
 beautifulsoup4>=4.12.2
-selenium>=4.15.0
+requests>=2.31.0
 lxml>=4.9.0
 fake-useragent>=1.4.0
+
+# Web Browser Automation (Optional)
+selenium>=4.15.0
+
+# Utilities
+tqdm>=4.66.1
+reportlab>=4.0.0
+
+# Additional dependencies for robust web scraping
+urllib3>=2.0.0
+certifi>=2023.7.22
+charset-normalizer>=3.2.0

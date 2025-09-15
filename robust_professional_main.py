@@ -1097,77 +1097,29 @@ def calculate_pattern_based_trust_score(claim, evidence_sources):
 try:
     from university_reviews import university_analyzer
     UNIVERSITY_REVIEWS_AVAILABLE = True
-    print("✅ OPTIMIZED university review analysis loaded successfully")
+    print("✅ University review analysis loaded successfully")
     
-    # Test the analyzer initialization
-    test_analyzer = university_analyzer
-    print("✅ Optimized university analyzer initialized and ready")
+    # Test the analyzer to ensure it's working
+    if hasattr(university_analyzer, 'search_university_reviews'):
+        print("✅ University analyzer methods verified")
+    else:
+        UNIVERSITY_REVIEWS_AVAILABLE = False
+        print("❌ University analyzer methods not found")
     
 except ImportError as e:
     UNIVERSITY_REVIEWS_AVAILABLE = False
-    print(f"⚠️ Optimized university review analysis not available: {e}")
+    print(f"❌ University review analysis not available: {e}")
+    print("💡 Install required packages: pip install duckduckgo-search beautifulsoup4")
 except Exception as e:
     UNIVERSITY_REVIEWS_AVAILABLE = False
-    print(f"⚠️ Optimized university analyzer initialization failed: {e}")
+    print(f"❌ University analyzer initialization failed: {e}")
 
 # Add this Pydantic model after your existing FileAnalysisRequest class
-class UniversitySearchRequest(BaseModel):
-    university_name: str
+# class UniversitySearchRequest(BaseModel):
+#     university_name: str
 
 # Add this new endpoint before your existing @app.get("/") route
-# @app.post("/api/university-reviews")
-# async def search_university_reviews(request: UniversitySearchRequest):
-#     """
-#     Search for university negative reviews and feedback
-#     """
-#     try:
-#         if not UNIVERSITY_REVIEWS_AVAILABLE:
-#             raise HTTPException(
-#                 status_code=503, 
-#                 detail="University review analysis service not available"
-#             )
-        
-#         university_name = request.university_name.strip()
-        
-#         if not university_name:
-#             raise HTTPException(
-#                 status_code=400, 
-#                 detail="University name is required"
-#             )
-        
-#         if len(university_name) < 3:
-#             raise HTTPException(
-#                 status_code=400, 
-#                 detail="University name must be at least 3 characters long"
-#             )
-        
-#         print(f"🏫 Starting university review search for: {university_name}")
-        
-#         # Perform the search
-#         results = university_analyzer.search_university_reviews(university_name)
-        
-#         if results.get('search_status') == 'error':
-#             raise HTTPException(
-#                 status_code=500, 
-#                 detail=f"Search failed: {results.get('error', 'Unknown error')}"
-#             )
-        
-#         # Add metadata
-#         results['api_version'] = '1.0'
-#         results['search_method'] = 'web_scraping_analysis'
-        
-#         print(f"✅ University search completed: {len(results.get('negative_reviews', []))} reviews found")
-        
-#         return JSONResponse(content=results, status_code=200)
-        
-#     except HTTPException:
-#         raise
-#     except Exception as e:
-#         print(f"🚨 University search error: {str(e)}")
-#         raise HTTPException(
-#             status_code=500, 
-#             detail=f"University search failed: {str(e)}"
-#         )
+
 
 # # Update your existing @app.get("/") route to include the new feature
 # # Replace the existing root function with this updated version:
@@ -1192,36 +1144,11 @@ def root():
 
 # # Update your existing @app.get("/status") route to include university reviews status
 # # Replace the existing status function with this updated version:
-# @app.get("/status")
-# def status():
-#     return {
-#         "status": "ok", 
-#         "message": "Robust professional server running",
-#         "pdf_processing": PDF_AVAILABLE,
-#         "full_pipeline": FULL_PIPELINE_AVAILABLE,
-#         "web_scraping": WEB_SCRAPING_AVAILABLE,
-#         "university_reviews": UNIVERSITY_REVIEWS_AVAILABLE,
-#         "analysis_mode": "full_llm_pipeline" if FULL_PIPELINE_AVAILABLE else "enhanced_pattern_matching"
-#     }
-
+# 
 # Add these fixes to your robust_professional_main.py file
 
 # 1. UPDATED IMPORT SECTION - Replace your existing university reviews import
-try:
-    from university_reviews import university_analyzer
-    UNIVERSITY_REVIEWS_AVAILABLE = True
-    print("✅ University review analysis loaded successfully")
-    
-    # Test the analyzer initialization
-    test_analyzer = university_analyzer
-    print("✅ University analyzer initialized and ready")
-    
-except ImportError as e:
-    UNIVERSITY_REVIEWS_AVAILABLE = False
-    print(f"⚠️ University review analysis not available: {e}")
-except Exception as e:
-    UNIVERSITY_REVIEWS_AVAILABLE = False
-    print(f"⚠️ University analyzer initialization failed: {e}")
+
 
 # 2. ENHANCED UNIVERSITY SEARCH REQUEST MODEL
 class UniversitySearchRequest(BaseModel):
@@ -1231,9 +1158,9 @@ class UniversitySearchRequest(BaseModel):
 
 # 3. UPDATED UNIVERSITY REVIEWS ENDPOINT - Replace your existing endpoint
 @app.post("/api/university-reviews")
-async def search_university_reviews_optimized(request: UniversitySearchRequest):
+async def search_university_reviews_fixed(request: UniversitySearchRequest):
     """
-    OPTIMIZED: Fast university review search with parallel processing
+    FIXED: Comprehensive university review search with negative incidents detection
     """
     start_time = time.time()
     
@@ -1241,11 +1168,18 @@ async def search_university_reviews_optimized(request: UniversitySearchRequest):
         if not UNIVERSITY_REVIEWS_AVAILABLE:
             return JSONResponse(
                 content={
-                    "error": "Optimized university review service not available",
-                    "details": "Required dependencies (duckduckgo-search, beautifulsoup4) may not be installed",
+                    "error": "University review service not available",
+                    "details": "Required dependencies not installed. Run: pip install duckduckgo-search beautifulsoup4",
                     "university_name": request.university_name,
                     "search_status": "service_unavailable",
-                    "processing_time": 0
+                    "processing_time": 0,
+                    "installation_help": {
+                        "commands": [
+                            "pip install duckduckgo-search",
+                            "pip install beautifulsoup4",
+                            "pip install fake-useragent"
+                        ]
+                    }
                 },
                 status_code=503
             )
@@ -1258,45 +1192,78 @@ async def search_university_reviews_optimized(request: UniversitySearchRequest):
         if len(university_name) < 3:
             raise HTTPException(status_code=400, detail="University name must be at least 3 characters")
         
-        print(f"🚀 OPTIMIZED API: Starting fast search for: '{university_name}'")
+        print(f"🔍 FIXED API: Starting comprehensive search for: '{university_name}'")
         
         try:
+            # Call the fixed analyzer
             results = university_analyzer.search_university_reviews(university_name)
             
             processing_time = time.time() - start_time
-            results['api_version'] = '3.0_optimized'
-            results['search_method'] = 'parallel_fast_processing'
+            
+            # Add API metadata
+            results['api_version'] = '4.0_fixed'
+            results['search_method'] = 'comprehensive_incident_detection'
             results['actual_processing_time'] = round(processing_time, 2)
             
-            if request.include_debug:
-                results['debug_info']['total_sources'] = len(results.get('sources', []))
+            # Add debug info if requested
+            if hasattr(request, 'include_debug') and request.include_debug:
+                results['debug_info'] = {
+                    'total_sources': len(results.get('sources', [])),
+                    'search_categories': [
+                        'serious_incidents', 'faculty_issues', 'news_articles',
+                        'review_platforms', 'social_media'
+                    ],
+                    'processing_steps': [
+                        'incident_detection', 'faculty_analysis', 'news_search',
+                        'review_extraction', 'social_monitoring'
+                    ]
+                }
             
-            if 'search_status' in results and results['search_status'] == 'error':
-                print(f"🚨 Optimized search failed: {results.get('error', 'Unknown error')}")
-                return JSONResponse(content={**results, "processing_time": round(processing_time, 2)}, status_code=200)
+            # Check for errors in results
+            if results.get('search_status') == 'error':
+                print(f"🚨 Search failed: {results.get('error', 'Unknown error')}")
+                return JSONResponse(content=results, status_code=200)
             
+            # Log successful results
+            incident_count = len(results.get('serious_incidents', []))
+            faculty_count = len(results.get('faculty_issues', []))
             review_count = len(results.get('negative_reviews', []))
             source_count = len(results.get('sources', []))
             
-            print(f"✅ OPTIMIZED search completed in {processing_time:.2f}s: {review_count} reviews, {source_count} sources")
+            print(f"✅ FIXED search completed in {processing_time:.2f}s:")
+            print(f"   - {incident_count} serious incidents")
+            print(f"   - {faculty_count} faculty issues")
+            print(f"   - {review_count} negative reviews")
+            print(f"   - {source_count} total sources")
             
             return JSONResponse(content=results, status_code=200)
             
         except Exception as search_error:
             processing_time = time.time() - start_time
-            print(f"🚨 Optimized search failed: {search_error}")
+            print(f"🚨 Search execution failed: {search_error}")
             
             error_response = {
                 "university_name": university_name,
                 "negative_reviews": [],
                 "positive_reviews": [],
-                "review_summary": {"total_negative_reviews": 0, "total_positive_reviews": 0, "average_rating": 0, "common_complaints": []},
+                "serious_incidents": [],
+                "faculty_issues": [],
+                "news_articles": [],
+                "social_media_mentions": [],
+                "review_summary": {
+                    "total_negative_reviews": 0,
+                    "total_positive_reviews": 0,
+                    "serious_incidents_count": 0,
+                    "faculty_issues_count": 0,
+                    "common_complaints": [],
+                    "severity_assessment": "unknown"
+                },
                 "sources": [],
                 "analysis_timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "search_status": "search_failed",
+                "search_status": "search_execution_failed",
                 "error": str(search_error),
                 "processing_time": round(processing_time, 2),
-                "api_version": "3.0_optimized_error"
+                "api_version": "4.0_fixed_error"
             }
             
             return JSONResponse(content=error_response, status_code=200)
@@ -1304,8 +1271,12 @@ async def search_university_reviews_optimized(request: UniversitySearchRequest):
     except HTTPException:
         raise
     except Exception as api_error:
-        print(f"🚨 OPTIMIZED API error: {api_error}")
-        raise HTTPException(status_code=500, detail=f"Optimized search failed: {str(api_error)}")
+        processing_time = time.time() - start_time
+        print(f"🚨 FIXED API error: {api_error}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Fixed search API failed: {str(api_error)}"
+        )
     
 def validate_university_search_results(results: Dict) -> Dict:
     """Validate and clean university search results"""
@@ -1508,4 +1479,4 @@ if __name__ == "__main__":
     
     # Get port from environment variable (for Render deployment)
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="localhost", port=port)
